@@ -1,8 +1,8 @@
---[ Bens Menu 0.2 ]--
+--[ Bens Menu 1.0 ]--
 --[ Based Off ZaHa ]--
 
 --[ Config ]--
-local hacks = {"Fly", "Noclip", "TP To", "Change Speed", "Change Jump Height", "Kick Player", "Make Announcement"}
+local hacks = {"Fly", "Noclip", "TP To", "Change Speed", "Change Jump Height", "Kick Player", "Make Announcement", "Invincible"}
 local hacksEnabled = {}
 
 local version = 0.2
@@ -106,6 +106,27 @@ local toggleAnnounceMenu = function(toggle)
 	announceMenu.Visible = toggle
 end
 
+-- Invincible Logic
+local invincibleConnection = nil
+
+local function enableInvincible()
+	local humanoid = p.Character and p.Character:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		invincibleConnection = humanoid.HealthChanged:Connect(function()
+			if humanoid.Health < humanoid.MaxHealth then
+				humanoid.Health = humanoid.MaxHealth
+			end
+		end)
+	end
+end
+
+local function disableInvincible()
+	if invincibleConnection then
+		invincibleConnection:Disconnect()
+		invincibleConnection = nil
+	end
+end
+
 -- UI for the Hack Menu
 function listHacks()
 	for i, v in pairs(hacks) do
@@ -129,6 +150,8 @@ function listHacks()
 
 				if v == "Make Announcement" then
 					toggleAnnounceMenu(true)
+				elseif v == "Invincible" then
+					enableInvincible()
 				end
 			else
 				print(v .. " disabled")
@@ -136,6 +159,8 @@ function listHacks()
 
 				if v == "Make Announcement" then
 					toggleAnnounceMenu(false)
+				elseif v == "Invincible" then
+					disableInvincible()
 				end
 			end
 		end)
@@ -151,4 +176,5 @@ UIS.InputBegan:Connect(function(input, isProcessed)
 		sg.Enabled = not sg.Enabled -- Toggle visibility
 	end
 end)
+
 
